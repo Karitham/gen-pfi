@@ -1,3 +1,4 @@
 *.txt
 *.md
 !README.md
+*.pdf
