@@ -23,7 +23,14 @@ func main() {
 
 	var d []Definition
 	for _, line := range lines {
-		ENPage, err := source.Lookup(line)
+		strs := strings.SplitN(line, " ", 2)
+		url := strs[0]
+		notes := ""
+		if len(strs) > 1 {
+			notes = strs[1]
+		}
+
+		ENPage, err := source.Lookup(url)
 		if err != nil {
 			log.Err(err).Str("word", line).Msg("error in getting word")
 		}
@@ -43,6 +50,7 @@ func main() {
 			MeaningEN: ENPage.Abstract,
 			WordFR:    FRPage.Title,
 			MeaningFR: FRPage.Abstract,
+			Notes:     notes,
 			Sources:   []Source{{Link: ENPage.URL}, {Link: FRPage.URL}},
 		})
 	}
