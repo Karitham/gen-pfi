@@ -39,8 +39,7 @@ func Lookup(url string) (Page, error) {
 	})
 
 	str := strings.Builder{}
-
-	doc.Find(".mw-parser-output p").EachWithBreak(func(i int, s *goquery.Selection) bool {
+	doc.Find(".mw-parser-output > p").EachWithBreak(func(i int, s *goquery.Selection) bool {
 		str.WriteString(s.Text())
 		return i < 3
 	})

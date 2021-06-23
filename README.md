@@ -8,6 +8,12 @@ give it a list of en wikipedia urls, and it builds a markdown file for you
 cat urls.txt | pfigen > pfi.md
 ```
 
+With pandoc, you can also do
+
+```sh
+cat urls.txt | pfigen | pandoc -o pfi.pdf --pdf-engine=xelatex
+```
+
 ## Example
 
 ### Input

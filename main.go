@@ -12,19 +12,26 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var verbose bool
-
-func init() {
-	flag.BoolVar(&verbose, "v", false, "run the program using verbose mode")
-	flag.Parse()
-}
-
 func main() {
+	var t templater
+	var verbose bool
+	var tname string
+
+	flag.BoolVar(&verbose, "v", false, "run the program using verbose mode")
+	flag.StringVar(&tname, "t", "basic", "run the program using the named template")
+	flag.Parse()
+
 	start := time.Now()
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "15:04:05"})
 	log.Logger = log.Level(zerolog.InfoLevel)
+
 	if verbose {
 		log.Logger = log.Level(zerolog.TraceLevel)
+	}
+
+	switch tname {
+	case "basic":
+		t = Basic{}
 	}
 
 	b, err := io.ReadAll(os.Stdin)
@@ -63,9 +70,9 @@ func main() {
 
 		d = append(d, Definition{
 			WordEN:    ENPage.Title,
-			MeaningEN: ENPage.Abstract,
+			MeaningEN: strings.TrimSpace(ENPage.Abstract),
 			WordFR:    FRPage.Title,
-			MeaningFR: FRPage.Abstract,
+			MeaningFR: strings.TrimSpace(FRPage.Abstract),
 			Notes:     notes,
 			Sources:   []Source{{Link: ENPage.URL}, {Link: FRPage.URL}},
 		})
@@ -75,9 +82,9 @@ func main() {
 	type D struct {
 		Definitions []Definition
 	}
-	if err := t.Execute(os.Stdout, &D{d}); err != nil {
+	if err := t.Template().Execute(os.Stdout, &D{d}); err != nil {
 		log.Panic().Err(err).Msg("error exc template")
 	}
 
-	log.Info().Msgf("took %dms", time.Since(start).Milliseconds())
+	log.Debug().Msgf("took %dms", time.Since(start).Milliseconds())
 }
